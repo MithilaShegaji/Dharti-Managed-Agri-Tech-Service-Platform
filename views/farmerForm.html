@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Registration | FarmConnect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #27ae60; /* A fresh, trustworthy green */
+            --primary-hover: #229954;
+            --secondary-color: #eafaf1; /* A very light green for backgrounds */
+            --text-color: #34495e; /* A soft, dark blue-gray */
+            --border-color: #dcdfe6;
+            --background-color: #f4f7f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 750px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: height 0.4s ease-in-out;
+        }
+
+        #farmerForm {
+            padding: 2.5rem 3rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- Progress Bar --- */
+        .progressbar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .progressbar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            width: 100%;
+            background: var(--border-color);
+            z-index: 1;
+        }
+
+        .progressbar .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            width: 0%; /* Initially 0 */
+            background: var(--primary-color);
+            z-index: 2;
+            transition: width 0.4s ease;
+        }
+
+        .progress-step {
+            position: relative;
+            z-index: 3;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--border-color);
+            font-weight: 600;
+            transition: all 0.4s ease;
+        }
+
+        .progress-step.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        /* --- Form Steps --- */
+        .form-step {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
+        }
+        
+        /* --- Custom File Upload --- */
+        .file-input-wrapper {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            background: var(--secondary-color);
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .file-input-wrapper:hover {
+            border-color: var(--primary-color);
+        }
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+        .file-input-label {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        .file-name {
+            display: block;
+            margin-top: 0.5rem;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        /* --- Checkbox --- */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 1.25em;
+            height: 1.25em;
+            accent-color: var(--primary-color);
+        }
+        .checkbox-group label {
+            margin-bottom: 0;
+        }
+
+        /* --- Buttons --- */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2.5rem;
+            justify-content: flex-end;
+        }
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+        .btn-secondary:hover {
+            background: #c8d0e0;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none; /* Hidden by default */
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        .success-message svg {
+            width: 80px;
+            height: 80px;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .success-message h2 {
+            font-size: 2rem;
+            color: var(--text-color);
+        }
+        .success-message p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container" id="formContainer">
+    
+    <form id="farmerForm" enctype="multipart/form-data" novalidate>
+        <h1>Farmer Onboarding</h1>
+
+        <!-- Progress Bar -->
+        <div class="progressbar">
+            <div class="progress-line"></div>
+            <div class="progress-step active">1</div>
+            <div class="progress-step">2</div>
+            <div class="progress-step">3</div>
+        </div>
+
+        <!-- Step 1: Personal Information -->
+        <div class="form-step active">
+            <h2 class="step-title">Personal Details</h2>
+            <div class="input-group">
+                <label for="firstName">First Name</label>
+                <input type="text" name="firstName" id="firstName" placeholder="Enter your first name" required />
+            </div>
+            <div class="input-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" name="lastName" id="lastName" placeholder="Enter your last name" />
+            </div>
+            <div class="input-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" name="phoneNumber" id="phoneNumber" placeholder="Enter your 10-digit number" required />
+            </div>
+            <div class="input-group">
+                <label for="photo">Your Photograph</label>
+                <div class="file-input-wrapper">
+                    <input type="file" name="photo" id="photo" accept="image/*" required />
+                    <label for="photo" class="file-input-label">Click to upload photo</label>
+                    <span class="file-name">No file chosen</span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <a href="#" class="btn btn-primary btn-next">Next →</a>
+            </div>
+        </div>
+
+        <!-- Step 2: Farming Details -->
+        <div class="form-step">
+            <h2 class="step-title">Farming & Location</h2>
+            <div class="input-group">
+                <label for="village">Village / Town</label>
+                <input type="text" name="village" id="village" placeholder="e.g., Rampur" required />
+            </div>
+            <div class="input-group">
+                <label for="district">District</label>
+                <input type="text" name="district" id="district" placeholder="e.g., Sitapur" required />
+            </div>
+            <div class="input-group">
+                <label for="state">State</label>
+                <input type="text" name="state" id="state" placeholder="e.g., Uttar Pradesh" required />
+            </div>
+            <div class="input-group">
+                <label for="experienceInYears">Farming Experience (in years)</label>
+                <input type="number" name="experienceInYears" id="experienceInYears" min="0" placeholder="e.g., 15" required />
+            </div>
+             <div class="input-group">
+                <label for="skills">Skills</label>
+                <input type="text" name="skills" id="skills" placeholder="e.g., Tractor driving, Sowing, Irrigation" required />
+            </div>
+            <div class="btn-group">
+                <a href="#" class="btn btn-secondary btn-prev">← Previous</a>
+                <a href="#" class="btn btn-primary btn-next">Next →</a>
+            </div>
+        </div>
+
+        <!-- Step 3: Verification -->
+        <div class="form-step">
+            <h2 class="step-title">Verification Documents</h2>
+            <div class="input-group">
+                <label for="aadharNumber">Aadhaar Number</label>
+                <input type="text" name="aadharNumber" id="aadharNumber" placeholder="Enter 12-digit Aadhaar number" required />
+            </div>
+             <div class="input-group">
+                <label for="aadharCard">Aadhaar Card Document</label>
+                <div class="file-input-wrapper">
+                    <input type="file" name="aadharCard" id="aadharCard" accept=".pdf,image/*" required />
+                    <label for="aadharCard" class="file-input-label">Click to upload document</label>
+                    <span class="file-name">PDF or Image</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="kisanCreditCardNumber">Kisan Credit Card (KCC) Number (Optional)</label>
+                <input type="text" name="kisanCreditCardNumber" id="kisanCreditCardNumber" placeholder="Enter if you have a KCC" />
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" name="isPmKisanRegistered" id="isPmKisanRegistered" />
+                <label for="isPmKisanRegistered">Are you registered under the PM-KISAN Scheme?</label>
+            </div>
+            <div class="btn-group">
+                <a href="#" class="btn btn-secondary btn-prev">← Previous</a>
+                <button type="submit" class="btn btn-primary">Submit Registration</button>
+            </div>
+        </div>
+    </form>
+    
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm5.71,8.29-6,6a1,1,0,0,1-1.42,0l-3-3a1,1,0,0,1,1.42-1.42L11,14.59l5.29-5.3a1,1,0,0,1,1.42,1.42Z"/></svg>
+        <h2>Registration Complete!</h2>
+        <p>Thank you. Your details have been submitted for verification.</p>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const prevBtns = document.querySelectorAll(".btn-prev");
+        const nextBtns = document.querySelectorAll(".btn-next");
+        const progress = document.querySelector(".progress-line");
+        const formSteps = document.querySelectorAll(".form-step");
+        const progressSteps = document.querySelectorAll(".progress-step");
+        const form = document.getElementById('farmerForm');
+        const formContainer = document.getElementById('formContainer');
+        const successMessage = document.getElementById('successMessage');
+
+        let formStepsNum = 0;
+
+        nextBtns.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                if(validateStep()){
+                    formStepsNum++;
+                    updateFormSteps();
+                    updateProgressBar();
+                }
+            });
+        });
+
+        prevBtns.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                formStepsNum--;
+                updateFormSteps();
+                updateProgressBar();
+            });
+        });
+
+        function updateFormSteps() {
+            formSteps.forEach(step => {
+                step.classList.remove("active");
+            });
+            formSteps[formStepsNum].classList.add("active");
+        }
+
+        function updateProgressBar() {
+            progressSteps.forEach((step, idx) => {
+                if (idx < formStepsNum + 1) {
+                    step.classList.add("active");
+                } else {
+                    step.classList.remove("active");
+                }
+            });
+            const progressActive = document.querySelectorAll(".progress-step.active");
+            progress.style.width = ((progressActive.length - 1) / (progressSteps.length - 1)) * 100 + '%';
+        }
+
+        function validateStep() {
+            let isValid = true;
+            const activeStep = formSteps[formStepsNum];
+            const inputs = activeStep.querySelectorAll("input[required], select[required]");
+            
+            inputs.forEach(input => {
+                if (!input.value.trim() || (input.type === 'file' && input.files.length === 0)) {
+                    input.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    input.style.borderColor = 'var(--border-color)';
+                }
+            });
+
+            if(!isValid) alert('Please fill all required fields in this step.');
+            return isValid;
+        }
+
+        // Custom file input display
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => {
+            input.addEventListener('change', (e) => {
+                const fileName = e.target.files[0] ? e.target.files[0].name : "No file chosen";
+                const fileDisplay = e.target.closest('.input-group').querySelector('.file-name');
+                if (fileDisplay) {
+                    fileDisplay.textContent = fileName;
+                }
+            });
+        });
+
+        // Handle Form Submission
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            if(!validateStep()) return;
+
+            const formData = new FormData(form);
+            
+            // Log form data for debugging
+            for(let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+
+            try {
+                const response = await fetch('http://localhost:7000/api/farmer', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    form.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    formContainer.style.height = successMessage.offsetHeight + 'px';
+                } else {
+                    alert('Submission failed: ' + (result.error || 'Unknown error'));
+                }
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

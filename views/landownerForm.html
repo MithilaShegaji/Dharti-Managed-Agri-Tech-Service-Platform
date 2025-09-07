@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landowner Registration | Dharti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --secondary-color: #ebf5fb;
+            --text-color: #34495e; 
+            --border-color: #dcdfe6;
+            --background-color: #f4f7f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        .form-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: height 0.4s ease-in-out;
+        }
+        #landownerForm { padding: 2.5rem 3rem; }
+        h1 { text-align: center; color: var(--text-color); font-weight: 600; margin-bottom: 1.5rem; }
+        .progressbar { display: flex; justify-content: space-between; margin-bottom: 2.5rem; position: relative; }
+        .progressbar::before { content: ''; position: absolute; top: 50%; left: 0; transform: translateY(-50%); height: 4px; width: 100%; background: var(--border-color); z-index: 1; }
+        .progressbar .progress-line { position: absolute; top: 50%; left: 0; transform: translateY(-50%); height: 4px; width: 0%; background: var(--primary-color); z-index: 2; transition: width 0.4s ease; }
+        .progress-step { position: relative; z-index: 3; width: 35px; height: 35px; border-radius: 50%; background: #fff; border: 3px solid var(--border-color); display: flex; justify-content: center; align-items: center; color: var(--border-color); font-weight: 600; transition: all 0.4s ease; }
+        .progress-step.active { border-color: var(--primary-color); background: var(--primary-color); color: #fff; }
+        .form-step { display: none; animation: fadeIn 0.5s; }
+        .form-step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .step-title { text-align: center; color: var(--primary-color); font-size: 1.5rem; font-weight: 600; margin-bottom: 2rem; }
+        .step-subtitle { font-weight: 600; color: var(--text-color); padding-bottom: 10px; border-bottom: 2px solid #f0f4f8; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-color); }
+        .input-group input, .input-group select { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s; }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); }
+        .input-row { display: flex; gap: 1rem; }
+        .input-row .input-group { flex: 1; }
+        .file-input-wrapper { border: 2px dashed var(--border-color); border-radius: 8px; padding: 1rem; text-align: center; background: var(--secondary-color); cursor: pointer; transition: border-color 0.3s; }
+        .file-input-wrapper:hover { border-color: var(--primary-color); }
+        .file-input-wrapper input[type="file"] { display: none; }
+        .file-input-label { color: var(--primary-color); font-weight: 500; }
+        .file-name { display: block; margin-top: 0.5rem; color: var(--text-color); font-size: 0.9rem; }
+        .map-placeholder { height: 250px; background-color: #eaf0f4; border: 1px solid var(--border-color); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #7f8c8d; }
+        .map-placeholder svg { width: 40px; height: 40px; margin-bottom: 10px; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.75rem; }
+        .checkbox-group input[type="checkbox"] { width: 1.25em; height: 1.25em; accent-color: var(--primary-color); }
+        .checkbox-group label { margin-bottom: 0; }
+        .btn-group { display: flex; gap: 1rem; margin-top: 2.5rem; justify-content: space-between; }
+        .btn { padding: 0.8rem 2rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-secondary { background: var(--border-color); color: var(--text-color); }
+        .btn-secondary:hover { background: #c8d0e0; }
+        /* Success Message Styling */
+        .success-message { text-align: center; padding: 3rem; animation: fadeIn 0.5s; }
+        .success-message svg { width: 80px; height: 80px; color: var(--primary-color); margin-bottom: 1rem; }
+        .success-message h2 { font-size: 2rem; color: var(--text-color); }
+        .success-message p { font-size: 1.1rem; color: #7f8c8d; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+
+<div class="form-container" id="formContainer">
+    <form id="landownerForm" novalidate enctype="multipart/form-data">
+        <h1>Landowner & Project Setup</h1>
+
+        <div class="progressbar">
+            <div class="progress-line"></div>
+            <div class="progress-step active">1</div>
+            <div class="progress-step">2</div>
+            <div class="progress-step">3</div>
+        </div>
+
+        <!-- Step 1: Your Profile -->
+        <div class="form-step active">
+            <h2 class="step-title">Your Profile</h2>
+            <div class="input-row">
+                <div class="input-group"><label for="firstName">First Name</label><input type="text" name="firstName" id="firstName" placeholder="As per official documents" required /></div>
+                <div class="input-group"><label for="lastName">Last Name</label><input type="text" name="lastName" id="lastName" placeholder="As per official documents" required /></div>
+            </div>
+            <div class="input-row">
+                <div class="input-group"><label for="phoneNumber">Phone Number</label><input type="tel" name="phoneNumber" id="phoneNumber" placeholder="For OTP and communication" required /></div>
+                <div class="input-group"><label for="email">Email Address</label><input type="email" name="email" id="email" placeholder="For reports and agreements" required /></div>
+            </div>
+            <div class="input-group"><label for="residentialAddress">Current Residential Address</label><input type="text" name="residentialAddress" id="residentialAddress" placeholder="City, State, Pincode" required /></div>
+            <h3 class="step-subtitle">Identity Verification</h3>
+            <div class="input-row">
+                <div class="input-group"><label for="aadharNumber">Aadhaar Number</label><input type="text" name="aadharNumber" id="aadharNumber" placeholder="12-digit number for KYL" required /></div>
+                <div class="input-group">
+                    <label for="photo">Your Photograph</label>
+                    <div class="file-input-wrapper"><input type="file" name="photo" id="photo" accept="image/*" required /><label for="photo" class="file-input-label">Upload your photo</label><span class="file-name">No file chosen</span></div>
+                </div>
+            </div>
+            <div class="btn-group"><span></span><a href="#" class="btn btn-primary btn-next">Next →</a></div>
+        </div>
+
+        <!-- Step 2: Land Details -->
+        <div class="form-step">
+            <h2 class="step-title">Your Land Details</h2>
+            <h3 class="step-subtitle">Location</h3>
+            <div class="input-group"><label for="landAddress">Land Location Address</label><input type="text" name="landAddress" id="landAddress" placeholder="Village/Town, District, State" required /></div>
+            <div class="input-group">
+                <label>Pin Land on Map</label>
+                <div class="map-placeholder"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2a8,8,0,0,0-8,8c0,5.4,7,11.5,7.35,11.76a1,1,0,0,0,1.3,0C13,21.5,20,15.4,20,10A8,8,0,0,0,12,2Zm0,11a3,3,0,1,1,3-3A3,3,0,0,1,12,13Z"/></svg><p><strong>Interactive Map Placeholder</strong><br>Click here to pinpoint your land's boundaries.</p></div>
+            </div>
+            <h3 class="step-subtitle">Area & Ownership</h3>
+            <div class="input-row">
+                <div class="input-group"><label for="landArea">Total Land Area</label><input type="number" name="landArea" id="landArea" placeholder="e.g., 5.5" required /></div>
+                <div class="input-group">
+                    <label for="landUnit">Unit</label>
+                    <select name="landUnit" id="landUnit" required><option value="acre">Acres</option><option value="hectare">Hectares</option><option value="bigha">Bigha</option><option value="gaj">Gaj</option></select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="ownershipProof">Proof of Ownership Document</label>
+                <div class="file-input-wrapper"><input type="file" name="ownershipProof" id="ownershipProof" accept=".pdf,image/*" required /><label for="ownershipProof" class="file-input-label">Upload Sale Deed, RoR, etc.</label><span class="file-name">PDF or Image</span></div>
+            </div>
+            <div class="btn-group"><a href="#" class="btn btn-secondary btn-prev">← Previous</a><a href="#" class="btn btn-primary btn-next">→ Next</a></div>
+        </div>
+
+        <!-- Step 3: Final Details -->
+        <div class="form-step">
+            <h2 class="step-title">Preferences & Confirmation</h2>
+            <h3 class="step-subtitle">Land Condition</h3>
+            <div class="input-group">
+                <label for="soilType">Soil Type</label>
+                <select name="soilType" id="soilType" required><option value="">-- Select soil type --</option><option value="recommend">I don't know / Please test my soil</option><option value="alluvial">Alluvial Soil</option><option value="black">Black Soil</option><option value="red">Red Soil</option><option value="laterite">Laterite Soil</option><option value="other">Other</option></select>
+            </div>
+            <div class="checkbox-group"><input type="checkbox" name="isPmKisanRegistered" id="isPmKisanRegistered" /><label for="isPmKisanRegistered">Is this land registered under the PM-KISAN Scheme?</label></div>
+            <h3 class="step-subtitle">Agreement</h3>
+            <div class="checkbox-group"><input type="checkbox" name="terms" id="terms" required /><label for="terms">I have read and agree to the <a href="#" target="_blank">Terms of Service</a> and Profit Sharing Agreement.</label></div>
+            <div class="btn-group"><a href="#" class="btn btn-secondary btn-prev">← Previous</a><button type="submit" class="btn btn-primary">Submit Project Request</button></div>
+        </div>
+    </form>
+    
+    <!-- Success Message Container -->
+    <div id="successMessageContainer" style="display: none;">
+        <div class="success-message">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm5.71,8.29-6,6a1,1,0,0,1-1.42,0l-3-3a1,1,0,0,1,1.42-1.42L11,14.59l5.29-5.3a1,1,0,0,1,1.42,1.42Z"/></svg>
+            <h2>Submission Complete!</h2>
+            <p>Thank you. Our team will review your details and contact you shortly.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // FIX: All JavaScript logic is now inside a single, correctly-scoped DOMContentLoaded listener.
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- VARIABLE DECLARATIONS ---
+        const form = document.getElementById('landownerForm');
+        const formContainer = document.getElementById('formContainer');
+        const successMessageContainer = document.getElementById('successMessageContainer');
+        
+        const prevBtns = document.querySelectorAll(".btn-prev");
+        const nextBtns = document.querySelectorAll(".btn-next");
+        const progress = document.querySelector(".progress-line");
+        const formSteps = document.querySelectorAll(".form-step");
+        const progressSteps = document.querySelectorAll(".progress-step");
+
+        let formStepsNum = 0; // Tracks the current step number
+
+        // --- CORE FUNCTIONS ---
+
+        function updateFormSteps() {
+            formSteps.forEach(step => step.classList.remove("active"));
+            formSteps[formStepsNum].classList.add("active");
+        }
+
+        function updateProgressBar() {
+            progressSteps.forEach((step, idx) => {
+                step.classList.toggle("active", idx < formStepsNum + 1);
+            });
+            const progressActive = document.querySelectorAll(".progress-step.active");
+            progress.style.width = ((progressActive.length - 1) / (progressSteps.length - 1)) * 100 + '%';
+        }
+        
+        // FIX: The validation function is now defined in the correct scope.
+        function validateStep() {
+            let isValid = true;
+            const activeStep = formSteps[formStepsNum];
+            const inputs = activeStep.querySelectorAll("input[required], select[required]");
+            
+            inputs.forEach(input => {
+                input.style.borderColor = 'var(--border-color)'; // Reset border color
+                let isInputValid = true;
+
+                if (input.type === 'checkbox') {
+                    if (!input.checked) isInputValid = false;
+                } else if (input.type === 'file') {
+                    if (input.files.length === 0) isInputValid = false;
+                } else {
+                    if (!input.value.trim()) isInputValid = false;
+                }
+
+                if (!isInputValid) {
+                    input.style.borderColor = 'red';
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                alert('Please fill all required fields in this step before proceeding.');
+            }
+            return isValid;
+        }
+
+        // --- EVENT LISTENERS ---
+
+        // 'Next' button clicks
+        nextBtns.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (validateStep()) {
+                    formStepsNum++;
+                    updateFormSteps();
+                    updateProgressBar();
+                }
+            });
+        });
+
+        // 'Previous' button clicks
+        prevBtns.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                formStepsNum--;
+                updateFormSteps();
+                updateProgressBar();
+            });
+        });
+
+        // Handle the final form submission
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            // Final validation check on the last step
+            if (!validateStep()) return;
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/api/landowner', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const resultText = await response.text();
+
+                if (response.ok) {
+                    form.style.display = 'none';
+                    successMessageContainer.style.display = 'block';
+                    formContainer.style.height = successMessageContainer.offsetHeight + 'px';
+                } else {
+                    alert('Submission failed: ' + resultText);
+                }
+            } catch (err) {
+                console.error('Error submitting form:', err);
+                alert('An error occurred while submitting. Please check your connection and try again.');
+            }
+        });
+
+        // Custom file input display logic
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const fileName = e.target.files[0] ? e.target.files[0].name : "No file chosen";
+                // FIX: Correctly targets the sibling span for the file name.
+                const fileDisplay = e.target.closest('.file-input-wrapper').querySelector('.file-name');
+                if (fileDisplay) fileDisplay.textContent = fileName;
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
